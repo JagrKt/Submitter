@@ -1,4 +1,4 @@
-rootProject.name = "Submitter"
+rootProject.name = "submitter"
 
 pluginManagement {
   plugins {
