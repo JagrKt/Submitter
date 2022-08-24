@@ -1,10 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
-    id("com.gradle.plugin-publish").version("0.14.0")
     `java-gradle-plugin`
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.gradle.publish)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "org.sourcegrade"
@@ -12,16 +13,10 @@ version = "0.5.2-SNAPSHOT"
 
 val kotlinxSerializationVersion: String by project
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(gradleKotlinDsl())
-    implementation("org.jetbrains:annotations:23.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:$kotlinxSerializationVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
+    implementation(libs.annotations)
+    implementation(libs.serialization)
 }
 
 tasks {
