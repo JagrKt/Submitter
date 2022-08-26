@@ -28,5 +28,6 @@ class SubmitterPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.extensions.add<SubmitExtension>("submit", SubmitExtensionImpl())
         target.tasks.register<PrepareSubmissionTask>("prepareSubmission")
+        target.tasks.register<WriteSubmissionInfoTask>("writeSubmissionInfo")
     }
 }

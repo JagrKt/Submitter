@@ -19,15 +19,17 @@
 
 package org.sourcegrade.submitter
 
-import org.gradle.api.GradleException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.jvm.tasks.Jar
+import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 
 @Suppress("LeakingThis")
-abstract class PrepareSubmissionTask : Jar() {
+abstract class WriteSubmissionInfoTask : DefaultTask() {
 
     @get:OutputDirectory
     val mainResourcesFile = project.buildDir.resolve("resources/submit")
@@ -36,41 +38,25 @@ abstract class PrepareSubmissionTask : Jar() {
     val submissionInfoFile = mainResourcesFile.resolve("submission-info.json")
 
     init {
-        dependsOn("writeSubmissionInfo")
+        dependsOn("compileJava")
         group = "submit"
         val submit = project.extensions.getByType<SubmitExtension>()
-        val sourceSets = project.extensions.getByName("sourceSets") as SourceSetContainer
-        from(*sourceSets.map { it.allSource }.toTypedArray())
-        from(submissionInfoFile)
-        archiveFileName.set(
-            buildString {
-                append(submit.assignmentId, "-")
-                append(submit.lastName, "-")
-                append(submit.firstName, "-")
-                append("submission.", submit.archiveExtension ?: "jar")
-            }
-        )
-        setOnlyIf {
-            verifySubmit()
-            true
+        if (submit.requireTests) {
+            project.tasks.findByName("test")?.let { dependsOn(it) }
+        }
+        if (submit.requirePublicTests) {
+            project.tasks.findByName("publicTest")?.let { dependsOn(it) }
         }
     }
 
-    private fun verifySubmit() {
+    @TaskAction
+    fun runTask() {
         val submit = project.extensions.getByType<SubmitExtension>()
-        val errors = buildString {
-            if (submit.assignmentId == null) appendLine("assignmentId")
-            if (submit.studentId == null) appendLine("studentId")
-            if (submit.firstName == null) appendLine("firstName")
-            if (submit.lastName == null) appendLine("lastName")
-        }
-        if (errors.isNotEmpty()) {
-            throw GradleException(
-                """
-There were some errors preparing your submission. The following required properties were not set:
-$errors
-"""
-            )
+        val submissionInfo = submit.toSubmissionInfo(
+            project.extensions.getByType<SourceSetContainer>().map { it.toInfo() })
+        submissionInfoFile.apply {
+            parentFile.mkdirs()
+            writeText(Json.encodeToString(submissionInfo))
         }
     }
 }
