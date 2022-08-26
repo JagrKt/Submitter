@@ -27,6 +27,7 @@ import org.gradle.kotlin.dsl.register
 class SubmitterPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.extensions.add<SubmitExtension>("submit", SubmitExtensionImpl())
+        target.tasks.register<WriteSubmissionInfoTask>("writeSubmissionInfo")
         target.tasks.register<PrepareSubmissionTask>("prepareSubmission")
     }
 }
