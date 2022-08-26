@@ -9,9 +9,7 @@ plugins {
 }
 
 group = "org.sourcegrade"
-version = "0.5.2-SNAPSHOT"
-
-val kotlinxSerializationVersion: String by project
+version = file("version").readLines().first()
 
 dependencies {
     implementation(gradleKotlinDsl())
