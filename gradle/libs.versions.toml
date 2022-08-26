@@ -6,7 +6,7 @@ annotations = "org.jetbrains:annotations:23.0.0"
 serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
 
 [plugins]
-gradle-publish = { id = "com.gradle.plugin-publish", version = "0.14.0" }
+gradle-publish = { id = "com.gradle.plugin-publish", version = "1.0.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

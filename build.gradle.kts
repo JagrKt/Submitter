@@ -42,13 +42,5 @@ gradlePlugin {
 pluginBundle {
     website = "https://www.sourcegrade.org"
     vcsUrl = "https://github.com/SourceGrade/Submitter"
-    (plugins) {
-        "submitter" {
-            tags = listOf("jagr", "assignment", "submission", "grading")
-        }
-    }
-    mavenCoordinates {
-        groupId = project.group.toString()
-        artifactId = "submitter"
-    }
+    tags = listOf("jagr", "assignment", "submission", "grading")
 }
