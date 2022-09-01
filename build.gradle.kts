@@ -41,6 +41,6 @@ gradlePlugin {
 
 pluginBundle {
     website = "https://www.sourcegrade.org"
-    vcsUrl = "https://github.com/SourceGrade/Submitter"
+    vcsUrl = "https://github.com/sourcegrade/submitter"
     tags = listOf("jagr", "assignment", "submission", "grading")
 }
