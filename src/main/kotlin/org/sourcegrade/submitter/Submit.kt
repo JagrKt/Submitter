@@ -40,4 +40,4 @@ internal data class SubmitExtensionImpl(
     override var requireTests: Boolean = true,
     override var requirePublicTests: Boolean = false,
     override var archiveExtension: String? = null,
-) : SubmitExtension
+) : SubmitExtension, java.io.Serializable

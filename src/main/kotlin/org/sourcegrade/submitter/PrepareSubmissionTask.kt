@@ -20,8 +20,7 @@
 package org.sourcegrade.submitter
 
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.getByType
@@ -29,11 +28,8 @@ import org.gradle.kotlin.dsl.getByType
 @Suppress("LeakingThis")
 abstract class PrepareSubmissionTask : Jar() {
 
-    @get:OutputDirectory
-    val mainResourcesFile = project.buildDir.resolve("resources/submit")
-
-    @get:Internal
-    val submissionInfoFile = mainResourcesFile.resolve("submission-info.json")
+    @get:InputFile
+    val submissionInfoFile = project.buildDir.resolve("resources/submit/submission-info.json")
 
     init {
         dependsOn("writeSubmissionInfo")
