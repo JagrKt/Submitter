@@ -22,17 +22,23 @@ package org.sourcegrade.submitter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.listProperty
 
 @Suppress("LeakingThis")
 abstract class WriteSubmissionInfoTask : DefaultTask() {
 
     @get:Input
     val submitExtension: SubmitExtension = project.extensions.getByType()
+
+    @get:Input
+    internal val sourceSets: ListProperty<SourceSetInfo> = project.objects.listProperty<SourceSetInfo>()
+        .convention(project.extensions.getByType<SourceSetContainer>().map { it.toInfo() })
 
     @get:OutputFile
     val submissionInfoFile = project.buildDir.resolve("resources/submit/submission-info.json")
@@ -51,8 +57,7 @@ abstract class WriteSubmissionInfoTask : DefaultTask() {
 
     @TaskAction
     fun runTask() {
-        val submissionInfo = submitExtension.toSubmissionInfo(
-            project.extensions.getByType<SourceSetContainer>().map { it.toInfo() })
+        val submissionInfo = submitExtension.toSubmissionInfo(sourceSets.get())
         submissionInfoFile.apply {
             parentFile.mkdirs()
             writeText(Json.encodeToString(submissionInfo))

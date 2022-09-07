@@ -35,7 +35,7 @@ internal data class SubmissionInfo(
 internal data class SourceSetInfo(
     val name: String,
     val files: List<String>,
-)
+) : java.io.Serializable
 
 internal fun SubmitExtension.toSubmissionInfo(
     sourceSets: List<SourceSetInfo>,
