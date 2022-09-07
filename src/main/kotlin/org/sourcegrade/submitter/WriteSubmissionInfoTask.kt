@@ -46,11 +46,10 @@ abstract class WriteSubmissionInfoTask : DefaultTask() {
     init {
         dependsOn("compileJava")
         group = "submit"
-        val submit = project.extensions.getByType<SubmitExtension>()
-        if (submit.requireTests) {
+        if (submitExtension.requireTests) {
             project.tasks.findByName("test")?.let { dependsOn(it) }
         }
-        if (submit.requirePublicTests) {
+        if (submitExtension.requirePublicTests) {
             project.tasks.findByName("publicTest")?.let { dependsOn(it) }
         }
     }
