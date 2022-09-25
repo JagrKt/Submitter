@@ -23,18 +23,37 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.listProperty
+import org.gradle.kotlin.dsl.provideDelegate
 
 @Suppress("LeakingThis")
 abstract class WriteSubmissionInfoTask : DefaultTask() {
 
     @get:Input
-    val submitExtension: SubmitExtension = project.extensions.getByType()
+    abstract val assignmentId: Property<String>
+
+    @get:Input
+    abstract val studentId: Property<String>
+
+    @get:Input
+    abstract val firstName: Property<String>
+
+    @get:Input
+    abstract val lastName: Property<String>
+
+    @get:Input
+    abstract val requireTests: Property<Boolean>
+
+    @get:Input
+    abstract val requirePublicTests: Property<Boolean>
 
     @get:Input
     internal val sourceSets: ListProperty<SourceSetInfo> = project.objects.listProperty<SourceSetInfo>()
@@ -46,17 +65,19 @@ abstract class WriteSubmissionInfoTask : DefaultTask() {
     init {
         dependsOn("compileJava")
         group = "submit"
-        if (submitExtension.requireTests) {
-            project.tasks.findByName("test")?.let { dependsOn(it) }
-        }
-        if (submitExtension.requirePublicTests) {
-            project.tasks.findByName("publicTest")?.let { dependsOn(it) }
-        }
+        dependsOn(requireTests.map { if (it) project.tasks["test"] else emptyList<Any>() })
+        dependsOn(requirePublicTests.map { if (it) project.tasks["publicTest"] else emptyList<Any>() })
     }
 
     @TaskAction
     fun runTask() {
-        val submissionInfo = submitExtension.toSubmissionInfo(sourceSets.get())
+        val submissionInfo = SubmissionInfo(
+            assignmentId.get(),
+            studentId.get(),
+            firstName.get(),
+            lastName.get(),
+            sourceSets.get(),
+        )
         submissionInfoFile.apply {
             parentFile.mkdirs()
             writeText(Json.encodeToString(submissionInfo))

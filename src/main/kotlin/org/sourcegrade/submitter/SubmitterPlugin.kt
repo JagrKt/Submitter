@@ -21,13 +21,30 @@ package org.sourcegrade.submitter
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.add
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.typeOf
 
 class SubmitterPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.extensions.add<SubmitExtension>("submit", SubmitExtensionImpl())
-        target.tasks.register<PrepareSubmissionTask>("prepareSubmission")
-        target.tasks.register<WriteSubmissionInfoTask>("writeSubmissionInfo")
+        val submitExtension = target.extensions.create(
+            typeOf<SubmitExtension>(),
+            "submit",
+            SubmitExtensionImpl::class.java,
+        ) as SubmitExtensionImpl
+        target.tasks.register<PrepareSubmissionTask>("prepareSubmission") {
+            assignmentId.set(submitExtension.assignmentIdProperty)
+            studentId.set(submitExtension.studentIdProperty)
+            firstName.set(submitExtension.firstNameProperty)
+            lastName.set(submitExtension.lastNameProperty)
+            archiveExtension.set(submitExtension.archiveExtensionProperty)
+        }
+        target.tasks.register<WriteSubmissionInfoTask>("writeSubmissionInfo") {
+            assignmentId.set(submitExtension.assignmentIdProperty)
+            studentId.set(submitExtension.studentIdProperty)
+            firstName.set(submitExtension.firstNameProperty)
+            lastName.set(submitExtension.lastNameProperty)
+            requireTests.set(submitExtension.requireTests)
+            requirePublicTests.set(submitExtension.requirePublicTests)
+        }
     }
 }

@@ -20,6 +20,7 @@
 package org.sourcegrade.submitter
 
 import org.gradle.api.GradleException
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.SourceSetContainer
@@ -30,7 +31,16 @@ import org.gradle.kotlin.dsl.getByType
 abstract class PrepareSubmissionTask : Jar() {
 
     @get:Input
-    val submitExtension: SubmitExtension = project.extensions.getByType()
+    abstract val assignmentId: Property<String>
+
+    @get:Input
+    abstract val studentId: Property<String>
+
+    @get:Input
+    abstract val firstName: Property<String>
+
+    @get:Input
+    abstract val lastName: Property<String>
 
     @get:InputFile
     val submissionInfoFile = project.buildDir.resolve("resources/submit/submission-info.json")
@@ -41,11 +51,12 @@ abstract class PrepareSubmissionTask : Jar() {
         from(*project.extensions.getByType<SourceSetContainer>().map { it.allSource }.toTypedArray())
         from(submissionInfoFile)
         archiveFileName.set(
-            buildString {
-                append(submitExtension.assignmentId, "-")
-                append(submitExtension.lastName, "-")
-                append(submitExtension.firstName, "-")
-                append("submission.", submitExtension.archiveExtension ?: "jar")
+            assignmentId.zip(lastName) { assignmentId, lastName ->
+                "$assignmentId-$lastName"
+            }.zip(firstName) { left, firstName ->
+                "$left-$firstName-submission"
+            }.zip(archiveExtension) { left, extension ->
+                "$left.$extension"
             }
         )
         setOnlyIf {
@@ -56,10 +67,10 @@ abstract class PrepareSubmissionTask : Jar() {
 
     private fun verifySubmit() {
         val errors = buildString {
-            if (submitExtension.assignmentId == null) appendLine("assignmentId")
-            if (submitExtension.studentId == null) appendLine("studentId")
-            if (submitExtension.firstName == null) appendLine("firstName")
-            if (submitExtension.lastName == null) appendLine("lastName")
+            if (!assignmentId.isPresent) appendLine("assignmentId")
+            if (!studentId.isPresent) appendLine("studentId")
+            if (!firstName.isPresent) appendLine("firstName")
+            if (!lastName.isPresent) appendLine("lastName")
         }
         if (errors.isNotEmpty()) {
             throw GradleException(

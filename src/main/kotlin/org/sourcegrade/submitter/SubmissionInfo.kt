@@ -37,16 +37,6 @@ internal data class SourceSetInfo(
     val files: List<String>,
 ) : java.io.Serializable
 
-internal fun SubmitExtension.toSubmissionInfo(
-    sourceSets: List<SourceSetInfo>,
-) = SubmissionInfo(
-    requireNotNull(assignmentId) { "assignmentId" },
-    requireNotNull(studentId) { "studentId" },
-    requireNotNull(firstName) { "firstName" },
-    requireNotNull(lastName) { "lastName" },
-    sourceSets,
-)
-
 internal fun SourceSet.getFiles(): List<String> {
     return allSource.files.map { file ->
         allSource.srcDirs.asSequence()
