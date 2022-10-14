@@ -3,7 +3,7 @@ kotlin = "1.7.10"
 
 [libraries]
 annotations = "org.jetbrains:annotations:23.0.0"
-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
 
 [plugins]
 gradle-publish = { id = "com.gradle.plugin-publish", version = "1.0.0" }
